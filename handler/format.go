@@ -1,4 +1,4 @@
-package main
+package handler
 
 // Format type
 type Format string

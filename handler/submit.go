@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func submit(w http.ResponseWriter, r *http.Request) {
+func Submit(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(405)
 		return

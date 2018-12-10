@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/sijad/serverlessman/handler"
 	"net/http"
 )
 
@@ -8,7 +9,7 @@ import (
 func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/submit":
-		submit(w, r)
+		handler.Submit(w, r)
 	default:
 		w.WriteHeader(404)
 	}
