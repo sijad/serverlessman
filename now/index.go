@@ -7,11 +7,5 @@ import (
 
 // Handler will be executed by now
 func Handler(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/submit":
-		handler.Submit(w, r)
-	default:
-		w.WriteHeader(404)
-	}
-	// fmt.Fprintf(w, r.URL.Path)
+	handler.Submit(w, r)
 }

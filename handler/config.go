@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"os"
+	"net/http"
 )
 
 // Config defines config file structure
@@ -19,13 +19,14 @@ type Config struct {
 var configs map[string]Config
 
 func init() {
-	jsonFile, err := os.Open("./config.json")
+	res, err := http.Get("https://raw.githubusercontent.com/sijad/serverlessman/master/now/config.json")
 	if err != nil {
 		panic(err)
 	}
-	defer jsonFile.Close()
 
-	dec := json.NewDecoder(jsonFile)
+	defer res.Body.Close()
+
+	dec := json.NewDecoder(res.Body)
 
 	dec.Decode(&configs)
 }
