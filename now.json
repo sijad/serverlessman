@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "name": "serverlessman",
+    "builds": [
+        { "src": "*.go", "use": "@now/go" }
+    ],
+    "env": {
+      "GITHUB_TOKEN": "@github_token"
+    }
+}
