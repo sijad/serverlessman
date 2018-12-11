@@ -4,11 +4,14 @@
     "builds": [
         { "src": "*.go", "use": "@now/go" }
     ],
+    "routes": [
+        { "src": "/submit", "dest": "/submit.go" }
+    ],
     "env": {
       "PROVIDER": "github",
       "GITHUB_TOKEN": "@github_token",
       "GITHUB_OWNER": "sijad",
       "GITHUB_BRANCH": "master",
-      "GITHUB_REPO": "test_staticnow"
+      "GITHUB_REPO": "hashemian.me"
     }
 }

@@ -23,7 +23,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	config, ok := configs[property]
 	if property == "" || !ok {
 		w.WriteHeader(400)
-		fmt.Fprintln(w, "peroperty not found")
+		fmt.Fprintln(w, "property not found")
 		return
 	}
 
