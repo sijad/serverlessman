@@ -11,15 +11,16 @@ type Transformer string
 
 // Transform convert input to coresponding value
 func (t Transformer) Transform(val string) string {
-	switch t {
-	case TransformerMD5:
-		sum := md5.Sum([]byte(val))
-		return hex.EncodeToString(sum[:])
-	case TransformerBASE64:
-		return base64.StdEncoding.EncodeToString([]byte(val))
-	default:
-		return ""
+	if t != "" {
+		switch t {
+		case TransformerMD5:
+			sum := md5.Sum([]byte(val))
+			return hex.EncodeToString(sum[:])
+		case TransformerBASE64:
+			return base64.StdEncoding.EncodeToString([]byte(val))
+		}
 	}
+	return ""
 }
 
 // Transforms
