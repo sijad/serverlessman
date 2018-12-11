@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Submit handles form submits
 func Submit(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(405)
@@ -68,7 +69,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	b := new(bytes.Buffer)
 	yaml.NewEncoder(b).Encode(fields)
 
-	if err := config.Provider.CreateNewFile(filePath, b); err != nil {
+	if err := provider.CreateNewFile(filePath, b, true); err != nil {
 		w.WriteHeader(500)
 		fmt.Println("error", err)
 		fmt.Fprintln(w, "somthing went wrong")

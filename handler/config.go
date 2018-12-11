@@ -1,15 +1,8 @@
 package handler
 
-import (
-	"encoding/json"
-	"net/http"
-)
-
 // Config defines config file structure
 type Config struct {
-	Fields   []Filed  `json:"fields"`
-	Provider Provider `json:"provider"`
-
+	Fields []Filed `json:"fields"`
 	Output struct {
 		Format string `json:"format"`
 		Path   string `json:"path"`
@@ -18,15 +11,12 @@ type Config struct {
 
 var configs map[string]Config
 
-func init() {
-	res, err := http.Get("https://raw.githubusercontent.com/sijad/serverlessman/master/now/config.json")
+// InitConfigs init provider configs
+func InitConfigs() {
+	c, err := provider.GetRepoConfigs()
 	if err != nil {
-		panic(err)
+		panic("can not get configs from provider: " + err.Error())
 	}
 
-	defer res.Body.Close()
-
-	dec := json.NewDecoder(res.Body)
-
-	dec.Decode(&configs)
+	configs = c
 }

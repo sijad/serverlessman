@@ -5,6 +5,10 @@
         { "src": "index.go", "use": "@now/go" }
     ],
     "env": {
-      "GITHUB_TOKEN": "@github_token"
+      "PROVIDER": "github",
+      "GITHUB_TOKEN": "@github_token",
+      "GITHUB_OWNER": "sijad",
+      "GITHUB_BRANCH": "master",
+      "GITHUB_REPO": "test_staticnow"
     }
 }

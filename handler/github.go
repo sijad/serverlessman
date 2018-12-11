@@ -4,8 +4,12 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"net/http"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
@@ -13,10 +17,14 @@ const (
 )
 
 type github struct {
-	token  string
-	branch string
-	repo   string
-	owner  string
+	Token  string
+	Branch string
+	Repo   string
+	Owner  string
+}
+
+type githubContent struct {
+	Content string `json:"content"`
 }
 
 type githubHeadRef struct {
@@ -44,7 +52,7 @@ type githubNewContent struct {
 }
 
 func (g *github) url() string {
-	return fmt.Sprintf(githubURI, g.owner, g.repo)
+	return fmt.Sprintf(githubURI, g.Owner, g.Repo)
 }
 
 func (g *github) get(path string, result interface{}) error {
@@ -55,6 +63,10 @@ func (g *github) get(path string, result interface{}) error {
 	}
 
 	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return errors.New("github get failed with status: " + res.Status)
+	}
 
 	if err := json.NewDecoder(res.Body).Decode(result); err != nil {
 		return err
@@ -89,7 +101,7 @@ func (g *github) post(path string, body interface{}) error {
 
 func (g *github) headers() map[string]string {
 	headers := make(map[string]string)
-	headers["Authorization"] = "token " + g.token
+	headers["Authorization"] = "token " + g.Token
 	headers["Content-Type"] = "application/json"
 	return headers
 }
@@ -110,7 +122,7 @@ func (g *github) CreateFile(path string, body io.Reader, branch string) error {
 
 func (g *github) CreateBranch(name string) error {
 	var gr githubHeadRef
-	if err := g.get("/git/refs/heads/"+g.branch, &gr); err != nil {
+	if err := g.get("/git/refs/heads/"+g.Branch, &gr); err != nil {
 		return err
 	}
 
@@ -131,7 +143,7 @@ func (g *github) CreateModerationRequest(branch string) error {
 		Title: "new entry",
 		Body:  "TODO",
 		Head:  branch,
-		Base:  g.branch,
+		Base:  g.Branch,
 	}
 
 	if err := g.post("/pulls", newPR); err != nil {
@@ -139,4 +151,53 @@ func (g *github) CreateModerationRequest(branch string) error {
 	}
 
 	return nil
+}
+
+// CreateNewFile Create a new file in git repo
+func (g *github) CreateNewFile(path string, body io.Reader, moderation bool) error {
+	branch := g.Branch
+
+	if moderation {
+		uid, err := uuid.NewV4()
+
+		if err != nil {
+			return err
+		}
+
+		branch = "serverlessman-" + uid.String()
+
+		if err := g.CreateBranch(branch); err != nil {
+			return err
+		}
+	}
+
+	if err := g.CreateFile(path, body, branch); err != nil {
+		return err
+	}
+
+	if moderation {
+		g.CreateModerationRequest(branch)
+	}
+
+	return nil
+}
+
+// GetRepoConfigs Create a new file in git repo
+func (g *github) GetRepoConfigs() (map[string]Config, error) {
+	var content githubContent
+	if err := g.get("/contents/serverlessman.json?ref="+g.Branch, &content); err != nil {
+		return nil, err
+	}
+
+	c, err := base64.URLEncoding.DecodeString(content.Content)
+	if err != nil {
+		return nil, err
+	}
+
+	var configs map[string]Config
+	if err := json.Unmarshal(c, &configs); err != nil {
+		return nil, err
+	}
+
+	return configs, nil
 }
