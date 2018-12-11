@@ -2,7 +2,7 @@
     "version": 2,
     "name": "serverlessman",
     "builds": [
-        { "src": "index.go", "use": "@now/go" }
+        { "src": "*.go", "use": "@now/go" }
     ],
     "env": {
       "PROVIDER": "github",
